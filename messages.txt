@@ -1,0 +1,2 @@
+Ok it is time to get started. This is a simple example of a web server written in Go.
+Now we're gonna read this file 8 bytes each time. That is how TCP kinda works, sending stuff packet by packet.
