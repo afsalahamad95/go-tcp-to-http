@@ -18,4 +18,21 @@ func main() {
 		log.Println(string(content[x : x+8]))
 		x += 8
 	}
+
+	// another approach:
+	newContent, err := os.Open("messages.txt")
+	if err != nil {
+		log.Println("there is an error", err)
+		return
+	}
+
+	for {
+		currentBuffer := make([]byte, 8)
+		read, err := newContent.Read(currentBuffer)
+		if err != nil {
+			log.Println("there was an error", err)
+			return
+		}
+		log.Println("read:", string(currentBuffer[:read]))
+	}
 }
