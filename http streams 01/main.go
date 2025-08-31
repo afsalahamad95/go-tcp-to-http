@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"log"
 	"os"
 )
@@ -14,8 +15,11 @@ func main() {
 
 	log.Println(string(content))
 	x := 0
+	res := ""
 	for x < len(content)-8 {
 		log.Println(string(content[x : x+8]))
+		res += string(content[x : x+8])
+		log.Println(res)
 		x += 8
 	}
 
@@ -34,5 +38,14 @@ func main() {
 			return
 		}
 		log.Println("read:", string(currentBuffer[:read]))
+
+		str := ""
+		if index := bytes.IndexByte(currentBuffer, '\n'); index != -1 {
+			str += string(currentBuffer)
+			log.Println(str)
+			str = ""
+		}
+
+		str += string(currentBuffer)
 	}
 }
