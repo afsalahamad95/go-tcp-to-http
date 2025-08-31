@@ -26,8 +26,11 @@ func getLinesFromChannel(f io.ReadCloser) <-chan string {
 			}
 			// we are looking for '/n' as the delimiter. If we see it we print the current sentence and print the next in the
 			// next line.
+
+			// note: this is a mini state machine below
 			if i := bytes.IndexByte(buffer, '\n'); i != -1 {
 				str += string(buffer[:i])
+				channel <- str
 				buffer = buffer[i+1:]     // this goes to the next line
 				log.Println("Read:", str) // print the current string in the current line
 				str = ""                  // reset the string so that we can print the next line
@@ -51,6 +54,6 @@ func main() {
 	log.Println("The result:")
 	// Note: The for-range block below will block till we get a value from the channel or till it is closed.
 	for line := range lines {
-		log.Println(line)
+		log.Println("received from chan:", line)
 	}
 }
