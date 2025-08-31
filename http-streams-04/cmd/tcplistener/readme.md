@@ -3,3 +3,7 @@ Make sure you have run the `main.go` before you do the above.
 
 Now, run the same command after terminating the go program.
 You will see a `connection refused` message. This is because we are usign a TCP connection and it does a handshake while creating the connection. The same will not be done in protocols like `UDP`.  Now this is because TCP requires the connection to be established before data can be sent.
+
+To see what a `GET` request looks like, just curl or make a `GET` request to the `localhost:42069` URL.
+To see what a `POST` request looks like, we're gonna cURL to it.
+`curl -X POST -H "Content-Type: application/json" -d '{"test": "yes"}' http://localhost:42069/test`

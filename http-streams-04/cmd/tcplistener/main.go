@@ -38,6 +38,7 @@ func getLinesFromChannel(f io.ReadCloser) <-chan string {
 			log.Printf("Read %v bytes", offset)
 			str += string(buffer) // so if we had a previous string with '\n', it would've been printed already and cleared
 			// from the buffer. Now we just print the string, which will be the current string.
+			log.Println(str)
 		}
 	}()
 	return channel
