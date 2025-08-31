@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"io"
 	"log"
 	"os"
@@ -10,19 +11,34 @@ import (
 // Note: io.ReadCloser is an interface with two methods - Read and Close.
 // So anything that implements that can be used here, we'll be using files here.
 func getLinesFromChannel(f io.ReadCloser) <-chan string {
-	ch := make(chan string, 1)
+	channel := make(chan string, 1)
 	go func() {
-		data := make([]byte, 1)
-		offset, err := f.Read(data)
-		if err != nil {
-			log.Println("There was an error", err)
-			return
-		}
-		log.Printf("Read %v bytes", offset)
-		ch <- string(data)
+		defer f.Close()
+		defer close(channel)
 
+		str := ""
+		for {
+			buffer := make([]byte, 8)
+			offset, err := f.Read(buffer)
+			if err != nil {
+				log.Println("There was an error", err)
+				break
+			}
+			buffer = buffer[:offset] // trim to current buffer size, which is 8 in this case
+			// we are looking for '/n' as the delimiter. If we see it we print the current sentence and print the next in the
+			// next line.
+			if i := bytes.IndexByte(buffer, '\n'); i != -1 {
+				str += string(buffer[:i])
+				buffer = buffer[i+1:]     // this goes to the next line
+				log.Println("Read:", str) // print the current string in the current line
+				str = ""                  // reset the string so that we can print the next line
+			}
+			log.Printf("Read %v bytes", offset)
+			str += string(buffer) // so if we had a previous string with '\n', it would've been printed already and cleared
+			// from the buffer. Now we just print the string, which will be the current string.
+		}
 	}()
-	return ch
+	return channel
 }
 
 func main() {
@@ -31,10 +47,11 @@ func main() {
 		log.Fatal("there was an error", err)
 		return
 	}
-	defer file.Close()
 
-	for {
-		dataChannel := getLinesFromChannel(file)
-		log.Println("Received:", <-dataChannel)
+	lines := getLinesFromChannel(file)
+	log.Println("The result:")
+	for line := range lines {
+		log.Println(line)
 	}
+
 }
