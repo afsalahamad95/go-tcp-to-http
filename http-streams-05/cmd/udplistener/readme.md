@@ -1,0 +1,1 @@
+run `nc -u -l 42069 ` to listen for udp packets. Make sure to run main.go in a separate terminal before this so that you don't get address already in use error.
